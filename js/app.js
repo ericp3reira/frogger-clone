@@ -29,6 +29,7 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
   this.sprite = 'images/char-boy.png';
+  // Initial position
   this.x = 200;
   this.y = 400;
 };
@@ -43,15 +44,15 @@ Player.prototype.render = function() {
 
 Player.prototype.handleInput = function(key) {
   // Position in pixels by key pressed.
-  // Used if...else instead of switch for the performance.
-  if (key === 'left') {
+  // Use if...else instead of switch for the performance.
+  if (key === 'left' && this.x > 0) {
     this.x -= 101;
-  } else if (key === 'right') {
+  } else if (key === 'right' && this.x < 402) {
     this.x += 101;
-  } else if (key === 'up') {
-    this.y -= 83;
-  } else if (key === 'down') {
-    this.y += 83;
+  } else if (key === 'up' && this.y > 0) {
+    this.y -= 82;
+  } else if (key === 'down' && this.y < 400) {
+    this.y += 82;
   }
 };
 
