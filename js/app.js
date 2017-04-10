@@ -2,38 +2,43 @@
 var Enemy = function() {
   // Variables applied to each of our instances go here,
   // we've provided one for you to get started
+  this.reset();
+  // The image/sprite for our enemies, this uses
+  // a helper we've provided to easily load images
+  this.sprite = 'images/enemy-bug.png';
+  // Width and height of the enemy for collision check
+  this.width = 171;
+  this.height = 101;
+};
+
+// Reset position and speed
+Enemy.prototype.reset = function() {
   // Randomize position
   var randomPosition = function() {
     var y;
     var position = Math.floor(Math.random() * 10);
     if (position < 4) {
-      y = 62;
+      y = 55;
     } else if (position >= 4 && position < 8) {
-      y = 145;
+      y = 137;
     } else {
-      y = 228;
+      y = 219;
     }
     return y;
   };
   //Randomize speed
   var randomSpeed = function() {
     var speed = Math.random() * 1000;
-    if (speed < 300 || speed > 800) {
-      speed = 400;
+    if (speed < 200) {
+      speed = 200;
+    } else if (speed > 600) {
+      speed = 600;
     }
     return speed;
   };
-  // Reset position and speed if there's no collision
-  var thisEnemy = this;
-  this.reset = function() {
-    thisEnemy.y = randomPosition();
-    thisEnemy.speed = randomSpeed();
-    thisEnemy.x = -101;
-  }
-  this.reset();
-  // The image/sprite for our enemies, this uses
-  // a helper we've provided to easily load images
-  this.sprite = 'images/enemy-bug.png';
+  this.y = randomPosition();
+  this.speed = randomSpeed();
+  this.x = -101;
 };
 
 // Update the enemy's position, required method for game
@@ -61,12 +66,22 @@ var Player = function() {
   // TODO Choose Player
   this.sprite = 'images/char-boy.png';
   // Initial position
-  this.x = 200;
-  this.y = 400;
+  this.reset();
+  // Width and height of the player for collision check
+  this.width = 101;
+  this.height = 171;
 };
 
 Player.prototype.update = function(dt) {
-
+  if (this.y < -10) {
+    this.reset();
+  }
+  // Collision check
+  var i = 0;
+  var enemies = allEnemies.length;
+  for(i == 0; i < enemies; i++) {
+    this.collisionCheck(allEnemies[i]);
+  }
 };
 
 Player.prototype.render = function() {
@@ -82,8 +97,21 @@ Player.prototype.handleInput = function(key) {
     this.x += 101;
   } else if (key === 'up' && this.y > 0) {
     this.y -= 82;
-  } else if (key === 'down' && this.y < 400) {
+  } else if (key === 'down' && this.y < 383) {
     this.y += 82;
+  }
+};
+
+// Reset the player position if won or lose
+Player.prototype.reset = function() {
+  this.y = 383;
+  this.x = 200;
+};
+
+// Collision check
+Player.prototype.collisionCheck = function(enemy) {
+  if ((this.x - 80 < enemy.x) && (this.x > enemy.x - 80) && (this.y === enemy.y)) {
+    this.reset();
   }
 };
 
