@@ -6,14 +6,11 @@ var Enemy = function() {
   // The image/sprite for our enemies, this uses
   // a helper we've provided to easily load images
   this.sprite = 'images/enemy-bug.png';
-  // Width and height of the enemy for collision check
-  this.width = 171;
-  this.height = 101;
 };
 
 // Reset position and speed
 Enemy.prototype.reset = function() {
-  // Randomize position
+  // Randomize y-position using probability (around 33%)
   var randomPosition = function() {
     var y;
     var position = Math.floor(Math.random() * 10);
@@ -26,7 +23,7 @@ Enemy.prototype.reset = function() {
     }
     return y;
   };
-  //Randomize speed
+  //Randomize speed, limiting minimum and maximum speeds
   var randomSpeed = function() {
     var speed = Math.random() * 1000;
     if (speed < 200) {
@@ -67,19 +64,16 @@ var Player = function() {
   this.sprite = 'images/char-boy.png';
   // Initial position
   this.reset();
-  // Width and height of the player for collision check
-  this.width = 101;
-  this.height = 171;
 };
 
 Player.prototype.update = function(dt) {
-  if (this.y < -10) {
-    this.reset();
-  }
+  // if (this.y < -10) {
+  //   this.reset();
+  // }
   // Collision check
-  var i = 0;
+  var i;
   var enemies = allEnemies.length;
-  for(i == 0; i < enemies; i++) {
+  for(i = 0; i < enemies; i++) {
     this.collisionCheck(allEnemies[i]);
   }
 };
@@ -105,14 +99,61 @@ Player.prototype.handleInput = function(key) {
 // Reset the player position if won or lose
 Player.prototype.reset = function() {
   this.y = 383;
-  this.x = 200;
+  this.x = 202;
 };
 
 // Collision check
 Player.prototype.collisionCheck = function(enemy) {
-  if ((this.x - 80 < enemy.x) && (this.x > enemy.x - 80) && (this.y === enemy.y)) {
+  if ((this.x - 70 < enemy.x) && (this.x > enemy.x - 70) && (this.y === enemy.y)) {
     this.reset();
   }
+};
+
+var Gem = function() {
+  this.reset();
+};
+
+Gem.prototype.update = function() {
+
+};
+
+Gem.prototype.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+Gem.prototype.reset = function() {
+  this.y = -27;
+  // Randomize position using probability (around 33%)
+  var randomX = function() {
+    var x;
+    var position = Math.floor(Math.random() * 10);
+    if (position < 2) {
+      x = 0;
+    } else if (position >= 2 && position < 4) {
+      x = 101;
+    } else if (position >= 4 && position < 6) {
+      x = 202;
+    } else if (position >= 6 && position < 8) {
+      x = 303;
+    } else {
+      x = 404;
+    }
+    return x;
+  };
+  this.x = randomX();
+  var randomGemSprite = function() {
+    var sprite;
+    var perc = Math.floor(Math.random() * 10);
+    if (perc < 4) {
+      sprite = 'blue';
+    } else if (perc >= 4 && perc < 7) {
+      sprite = 'green';
+    } else {
+      sprite = 'orange';
+    }
+    return 'images/gem-' + sprite + '.png';
+  };
+  this.sprite = randomGemSprite();
 };
 
 // Now instantiate your objects.
@@ -121,6 +162,7 @@ Player.prototype.collisionCheck = function(enemy) {
 var enemyOne = new Enemy(), enemyTwo = new Enemy(), enemyThree = new Enemy();
 var allEnemies = [enemyOne, enemyTwo, enemyThree];
 var player = new Player();
+var gem = new Gem();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
