@@ -11,7 +11,7 @@ var Enemy = function() {
 // Reset position and speed
 Enemy.prototype.reset = function() {
   // Randomize y-position using probability (around 33%)
-  var randomPosition = function() {
+  var randomY = function() {
     var y;
     var position = Math.floor(Math.random() * 10);
     if (position < 4) {
@@ -33,7 +33,7 @@ Enemy.prototype.reset = function() {
     }
     return speed;
   };
-  this.y = randomPosition();
+  this.y = randomY();
   this.speed = randomSpeed();
   this.x = -101;
 };
@@ -67,14 +67,21 @@ var Player = function() {
 };
 
 Player.prototype.update = function(dt) {
-  // if (this.y < -10) {
-  //   this.reset();
-  // }
-  // Collision check
+  // Collision check with enemies
   var i;
   var enemies = allEnemies.length;
-  for(i = 0; i < enemies; i++) {
-    this.collisionCheck(allEnemies[i]);
+  for (i = 0; i < enemies; i++) {
+    if (this.collisionCheck(allEnemies[i])) {
+        this.reset();
+    }
+  }
+  // Check if gem is collected
+  if (this.collisionCheck(gem)) {
+    gem.reset();
+    this.reset();
+  // Check if player reached the
+} else if (this.y === -27) {
+    this.reset();
   }
 };
 
@@ -103,9 +110,9 @@ Player.prototype.reset = function() {
 };
 
 // Collision check
-Player.prototype.collisionCheck = function(enemy) {
-  if ((this.x - 70 < enemy.x) && (this.x > enemy.x - 70) && (this.y === enemy.y)) {
-    this.reset();
+Player.prototype.collisionCheck = function(item) {
+  if ((this.x - 70 < item.x) && (this.x > item.x - 70) && (this.y === item.y)) {
+    return true;
   }
 };
 
