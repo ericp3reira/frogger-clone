@@ -1,3 +1,7 @@
+//
+// Enemy
+//
+
 // Enemies our player must avoid
 var Enemy = function() {
   // Variables applied to each of our instances go here,
@@ -8,34 +12,16 @@ var Enemy = function() {
   this.sprite = 'images/enemy-bug.png';
 };
 
-// Reset position and speed
+// Reset enemy position and speed
 Enemy.prototype.reset = function() {
-  // Randomize y-position using probability (around 33%)
-  var randomY = function() {
-    var y;
-    var position = Math.floor(Math.random() * 10);
-    if (position < 4) {
-      y = 55;
-    } else if (position >= 4 && position < 8) {
-      y = 137;
-    } else {
-      y = 219;
-    }
-    return y;
-  };
-  //Randomize speed, limiting minimum and maximum speeds
+  //Randomize speed, limiting minimum (200) and maximum (600) speeds
   var randomSpeed = function() {
-    var speed = Math.random() * 1000;
-    if (speed < 200) {
-      speed = 200;
-    } else if (speed > 600) {
-      speed = 600;
-    }
+    var speed = (Math.random() * 400) + 200;
     return speed;
   };
-  this.y = randomY();
+  this.y = randomize('y');
   this.speed = randomSpeed();
-  this.x = -101;
+  this.x = -202;
 };
 
 // Update the enemy's position, required method for game
@@ -56,33 +42,42 @@ Enemy.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+//
+// Player
+//
+
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-  // TODO Choose Player
+  // TODO: Choose Player sprite
   this.sprite = 'images/char-boy.png';
   // Initial position
   this.reset();
+  // Initial points
+  this.points = 0;
 };
 
 Player.prototype.update = function(dt) {
   // Collision check with enemies
-  var i;
-  var enemies = allEnemies.length;
+  var i, enemies = allEnemies.length;
   for (i = 0; i < enemies; i++) {
     if (this.collisionCheck(allEnemies[i])) {
-        this.reset();
+      gameOver();
     }
   }
-  // Check if gem is collected
+  // Check if gem is collected and add points
   if (this.collisionCheck(gem)) {
+    this.addPoints(100);
     gem.reset();
     this.reset();
-  // Check if player reached the
-} else if (this.y === -27) {
+  // Check if player reached the water without
+  // getting the gem
+  } else if (this.y === -27) {
     this.reset();
   }
+  // Show updated points
+  showPoints(this.points);
 };
 
 Player.prototype.render = function() {
@@ -109,19 +104,27 @@ Player.prototype.reset = function() {
   this.x = 202;
 };
 
-// Collision check
+// Collision check with any item (enemies or gem)
 Player.prototype.collisionCheck = function(item) {
-  if ((this.x - 70 < item.x) && (this.x > item.x - 70) && (this.y === item.y)) {
+  if ((this.x - 50 < item.x) && (this.x > item.x - 70) && (this.y === item.y)) {
     return true;
+  } else {
+    return false;
   }
 };
 
-var Gem = function() {
-  this.reset();
+// Add points and show at the top of the canvas
+Player.prototype.addPoints = function(pts) {
+  this.points += pts;
 };
 
-Gem.prototype.update = function() {
+//
+// Gems
+//
 
+// Gems our player must get
+var Gem = function() {
+  this.reset();
 };
 
 Gem.prototype.render = function() {
@@ -130,24 +133,9 @@ Gem.prototype.render = function() {
 
 Gem.prototype.reset = function() {
   this.y = -27;
-  // Randomize position using probability (around 33%)
-  var randomX = function() {
-    var x;
-    var position = Math.floor(Math.random() * 10);
-    if (position < 2) {
-      x = 0;
-    } else if (position >= 2 && position < 4) {
-      x = 101;
-    } else if (position >= 4 && position < 6) {
-      x = 202;
-    } else if (position >= 6 && position < 8) {
-      x = 303;
-    } else {
-      x = 404;
-    }
-    return x;
-  };
-  this.x = randomX();
+  this.x = randomize('x');
+  // Randomize the available gem sprites
+  // TODO: different colors, different points
   var randomGemSprite = function() {
     var sprite;
     var perc = Math.floor(Math.random() * 10);
@@ -163,6 +151,62 @@ Gem.prototype.reset = function() {
   this.sprite = randomGemSprite();
 };
 
+//
+// Game functionalities
+//
+
+// Randomize the position of x or y
+var randomize = function(coor) {
+  var pos;
+  var perc = Math.floor(Math.random() * 10);
+  // Randomize x-position using probability (around 20%)
+  if (coor === "x") {
+    if (perc < 2) {
+      pos = 0;
+    } else if (perc >= 2 && perc < 4) {
+      pos = 101;
+    } else if (perc >= 4 && perc < 6) {
+      pos = 202;
+    } else if (perc >= 6 && perc < 8) {
+      pos = 303;
+    } else {
+      pos = 404;
+    }
+    return pos;
+  // Randomize y-position using probability (around 33%)
+  } else {
+    if (perc < 3) {
+      pos = 55;
+    } else if (perc >= 3 && perc < 7) {
+      pos = 137;
+    } else {
+      pos = 219;
+    }
+    return pos;
+  }
+};
+
+// Show player's points
+var showPoints = function(pts) {
+  ctx.clearRect(0, 0, 505, 606);
+  ctx.font = '20px serif';
+  ctx.strokeText(pts, 10, 50);
+};
+
+// Resets the points
+// TODO: show a "game over" message on screen,
+// points and a "new game" button
+var gameOver = function() {
+  gem.reset();
+  player.reset();
+  player.points = 0;
+};
+
+// TODO: Redefine canvas and restart points
+var newGame = function() {
+
+};
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
@@ -174,12 +218,12 @@ var gem = new Gem();
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
+  var allowedKeys = {
+      37: 'left',
+      38: 'up',
+      39: 'right',
+      40: 'down'
+  };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+  player.handleInput(allowedKeys[e.keyCode]);
 });

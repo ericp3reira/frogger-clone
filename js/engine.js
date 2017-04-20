@@ -96,7 +96,6 @@ var Engine = (function(global) {
         });
         player.update();
 
-        gem.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -154,7 +153,7 @@ var Engine = (function(global) {
         });
 
         player.render();
-
+        // Add the gem render function
         gem.render();
     }
 
@@ -176,6 +175,7 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
+        // Add new images to the game
         'images/gem-green.png',
         'images/gem-blue.png',
         'images/gem-orange.png'
