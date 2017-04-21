@@ -21,6 +21,8 @@ Enemy.prototype.reset = function() {
   };
   this.y = randomize('y');
   this.speed = randomSpeed();
+  // Start position of the enemy,
+  // giving some time before it appears
   this.x = -202;
 };
 
@@ -68,13 +70,13 @@ Player.prototype.update = function(dt) {
   }
   // Check if gem is collected and add points
   if (this.collisionCheck(gem)) {
-    this.addPoints(100);
+    this.addPoints(gem.type);
     gem.reset();
-    this.reset();
-  // Check if player reached the water without
-  // getting the gem
+    // this.reset();
+  // Check if player drowned in the water
+  // without getting the gem
   } else if (this.y === -27) {
-    this.reset();
+    gameOver();
   }
   // Show updated points
   showPoints(this.points);
@@ -114,8 +116,14 @@ Player.prototype.collisionCheck = function(item) {
 };
 
 // Add points and show at the top of the canvas
-Player.prototype.addPoints = function(pts) {
-  this.points += pts;
+Player.prototype.addPoints = function(gem) {
+  if (gem === "blue") {
+    this.points += 100;
+  } else if (gem === "green") {
+    this.points += 300;
+  } else if (gem === "orange") {
+    this.points += 600;
+  }
 };
 
 //
@@ -132,23 +140,11 @@ Gem.prototype.render = function() {
 };
 
 Gem.prototype.reset = function() {
-  this.y = -27;
+  this.y = randomize('y');
   this.x = randomize('x');
+  this.type = randomGem();
   // Randomize the available gem sprites
-  // TODO: different colors, different points
-  var randomGemSprite = function() {
-    var sprite;
-    var perc = Math.floor(Math.random() * 10);
-    if (perc < 4) {
-      sprite = 'blue';
-    } else if (perc >= 4 && perc < 7) {
-      sprite = 'green';
-    } else {
-      sprite = 'orange';
-    }
-    return 'images/gem-' + sprite + '.png';
-  };
-  this.sprite = randomGemSprite();
+  this.sprite = 'images/gem-' + this.type + '.png';
 };
 
 //
@@ -190,21 +186,35 @@ var randomize = function(coor) {
 var showPoints = function(pts) {
   ctx.clearRect(0, 0, 505, 606);
   ctx.font = '20px serif';
-  ctx.strokeText(pts, 10, 50);
+  ctx.strokeText(pts, 10, 20);
 };
 
-// Resets the points
+// Randomize the available gems
+// 60% blue, 30% green, 10% orange
+var randomGem = function() {
+  var sprite;
+  var perc = Math.floor(Math.random() * 10);
+  if (perc < 6) {
+    sprite = 'blue';
+  } else if (perc >= 6 && perc < 9) {
+    sprite = 'green';
+  } else {
+    sprite = 'orange';
+  }
+  return sprite;
+};
+
 // TODO: show a "game over" message on screen,
 // points and a "new game" button
 var gameOver = function() {
+  newGame();
+};
+
+// Redefine canvas and restart points
+var newGame = function() {
   gem.reset();
   player.reset();
   player.points = 0;
-};
-
-// TODO: Redefine canvas and restart points
-var newGame = function() {
-
 };
 
 // Now instantiate your objects.
