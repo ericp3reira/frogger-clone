@@ -7,6 +7,8 @@ This game is a project from [Udacity's Front-End Nanodegree](https://udacity.com
 
 All the assets and the engine were provided by Udacity. I had to develop `app.js` using object-oriented functions.
 
+And you can play it [here](https://ericp3reira.github.io/frogger-clone/)! =D
+
 ## How To Play
 
 1. Download or clone this project and run `index.html`;
