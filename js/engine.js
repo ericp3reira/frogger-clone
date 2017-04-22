@@ -178,7 +178,8 @@ var Engine = (function(global) {
         // Add new images to the game
         'images/gem-green.png',
         'images/gem-blue.png',
-        'images/gem-orange.png'
+        'images/gem-orange.png',
+        'images/heart.png'
     ]);
     Resources.onReady(init);
 

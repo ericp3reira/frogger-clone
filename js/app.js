@@ -54,10 +54,11 @@ Enemy.prototype.render = function() {
 var Player = function() {
   // TODO: Choose Player sprite
   this.sprite = 'images/char-boy.png';
-  // Initial position
-  this.reset();
-  // Initial points
+  // Initiate position, life points and points
+  this.y = 383;
+  this.x = 202;
   this.points = 0;
+  this.lifePoints = 3;
 };
 
 Player.prototype.update = function(dt) {
@@ -65,18 +66,22 @@ Player.prototype.update = function(dt) {
   var i, enemies = allEnemies.length;
   for (i = 0; i < enemies; i++) {
     if (this.collisionCheck(allEnemies[i])) {
-      gameOver();
+      this.checkLifePoints();
+      this.reset();
+      gem.reset();
     }
   }
   // Check if gem is collected and add points
   if (this.collisionCheck(gem)) {
     this.addPoints(gem.type);
     gem.reset();
-    // this.reset();
+  }
   // Check if player drowned in the water
   // without getting the gem
-  } else if (this.y === -27) {
-    gameOver();
+  if (this.y === -27) {
+    this.checkLifePoints();
+    this.reset();
+    gem.reset();
   }
   // Show updated points
   showPoints(this.points);
@@ -84,6 +89,9 @@ Player.prototype.update = function(dt) {
 
 Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  for (var i = 0; i < this.lifePoints; i++) {
+    ctx.drawImage(Resources.get('images/heart.png'), 404 - (30*i), -48);
+  }
 };
 
 Player.prototype.handleInput = function(key) {
@@ -104,6 +112,10 @@ Player.prototype.handleInput = function(key) {
 Player.prototype.reset = function() {
   this.y = 383;
   this.x = 202;
+  if (!this.lifePoints) {
+    this.points = 0;
+    this.lifePoints = 3;
+  }
 };
 
 // Collision check with any item (enemies or gem)
@@ -126,6 +138,14 @@ Player.prototype.addPoints = function(gem) {
   }
 };
 
+Player.prototype.checkLifePoints = function() {
+  // Check if there is life points left,
+  // otherwise it is game over
+  if (this.lifePoints) {
+    this.lifePoints--;
+  }
+};
+
 //
 // Gems
 //
@@ -142,8 +162,21 @@ Gem.prototype.render = function() {
 Gem.prototype.reset = function() {
   this.y = randomize('y');
   this.x = randomize('x');
+  // Randomize the available gems
+  // 60% blue, 30% green, 10% orange
+  var randomGem = function() {
+    var sprite;
+    var perc = Math.floor(Math.random() * 10);
+    if (perc < 6) {
+      sprite = 'blue';
+    } else if (perc >= 6 && perc < 9) {
+      sprite = 'green';
+    } else {
+      sprite = 'orange';
+    }
+    return sprite;
+  };
   this.type = randomGem();
-  // Randomize the available gem sprites
   this.sprite = 'images/gem-' + this.type + '.png';
 };
 
@@ -185,36 +218,8 @@ var randomize = function(coor) {
 // Show player's points
 var showPoints = function(pts) {
   ctx.clearRect(0, 0, 505, 606);
-  ctx.font = '20px serif';
-  ctx.strokeText(pts, 10, 20);
-};
-
-// Randomize the available gems
-// 60% blue, 30% green, 10% orange
-var randomGem = function() {
-  var sprite;
-  var perc = Math.floor(Math.random() * 10);
-  if (perc < 6) {
-    sprite = 'blue';
-  } else if (perc >= 6 && perc < 9) {
-    sprite = 'green';
-  } else {
-    sprite = 'orange';
-  }
-  return sprite;
-};
-
-// TODO: show a "game over" message on screen,
-// points and a "new game" button
-var gameOver = function() {
-  newGame();
-};
-
-// Redefine canvas and restart points
-var newGame = function() {
-  gem.reset();
-  player.reset();
-  player.points = 0;
+  ctx.font = '40px serif';
+  ctx.strokeText(pts, 0, 40);
 };
 
 // Now instantiate your objects.
